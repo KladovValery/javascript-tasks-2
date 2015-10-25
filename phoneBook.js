@@ -1,57 +1,50 @@
 'use strict';
 
-var phoneBook = []; 
+var phoneBook = [];
 
 function checkEmail(email) {
- var parts = email.split('@');
+    var parts = email.split('@');
  
- if (parts.length !== 2)
-  return false;
- 
- if (parts[1].indexOf('.') === -1)
-  return false;
- 
-  return true;
+    if (parts.length !== 2) {
+        return false;
+      }
+
+    return parts[1].indexOf('.') !== -1;
 }
 
 function checkPhone(phone) {
-    if (phone.length !== 10)
-        return false;
- 
-    return true;
+    return phone.length === 10;
 }
 
 function checkName(name) {
-  name = name.replace(/ /g, '');
+    name = name.replace(/ /g, '');
 
-  return name.length > 0;
+    return name.length > 0;
 }
 
 function getClearPhone(phone) {
-    phone = phone.replace(/^\+/, '');
-    phone = phone.replace(/^7/, '');
-    phone = phone.replace(/[^0-9]/g, '');
- 
-    return phone;
+    return phone 
+        .replace(/^\+/, '')
+        .replace(/^7/, '')
+        .replace(/[^0-9]/g, '');
 }
 
 function checkValidForms(name, phone, email){
-
-  return checkName(name) && checkPhone(phone) && checkEmail(email);
+    return checkName(name) && checkPhone(phone) && checkEmail(email);
 }
 
 function findInArray(array, query, onlyIndex){
- var resultArray = [];
+    var resultArray = [];
 
- array.forEach(function(person, index){
-   if (person.name.indexOf(query) !== -1 ||
-       person.email.indexOf(query) !== -1 ||
-       person.phone.indexOf(query) !== -1) {
-       resultArray.push(onlyIndex ? index : person);
-   }
- });
+    array.forEach(function(person, index){
+        if (person.name.indexOf(query) !== -1 ||
+            person.email.indexOf(query) !== -1 ||
+            person.phone.indexOf(query) !== -1) {
+            resultArray.push(onlyIndex ? index : person);
+          }
+      });
  
- return resultArray;
+    return resultArray;
 }
 
 /*
@@ -59,23 +52,23 @@ function findInArray(array, query, onlyIndex){
    На вход может прийти что угодно, будьте осторожны.
 */
 module.exports.add = function add(name, phone, email) {
-  var clearPhone = getClearPhone(phone);
-  if (checkValidForms(name, clearPhone, email)) {  
-    var person = {
-      name: name,
-      phone: clearPhone,
-      email: email
-    };
-    phoneBook.push(person);
+    var clearPhone = getClearPhone(phone);
+    if (checkValidForms(name, clearPhone, email)) {  
+        var person = {
+            name: name,
+            phone: clearPhone,
+            email: email
+        };
+        phoneBook.push(person);
     
-    console.log("%s %s %s", 'Контакт', name,'добавлен');
+        console.log("%s %s %s", 'Контакт', name,'добавлен');
 
-    return person;
-  } else {
-    console.log('Вы неправильно ввели данные :(');
+        return person;
+    } else {
+        console.log('Вы неправильно ввели данные :(');
 
-    return false;
-  }
+        return false;
+    }
 
 };
 
@@ -84,33 +77,42 @@ module.exports.add = function add(name, phone, email) {
    Поиск ведется по всем полям.
 */
 module.exports.find = function find(query) {
-  console.log("start find");
-  var foundRes = [];
+    console.log("start find");
+    var foundRes = [];
 
-  if (!query) {
-    foundRes = phoneBook;
-  } else {
-    foundRes = findInArray(phoneBook, query);
-  }
+    if (!query) {
+        foundRes = phoneBook;
+    } else {
+        foundRes = findInArray(phoneBook, query);
+    } 
 
-  foundRes.forEach(function(person){
-    console.log("%s, %s, %s", person.name, person.phone, person.email);
-  } )
+    foundRes.forEach(function(person){
+        console.log("%s, %s, %s", person.name, person.phone, person.email);
+    } )
 
-  return foundRes;
+    return foundRes;
 };
-
 /*
    Функция удаления записи в телефонной книге.
 */
+function inArray(value, array) {
+    for(var i = 0; i < array.length; i++) {
+        if(array[i] == value) {
+
+         return true;
+        }
+    }
+
+    return false;
+}
 module.exports.remove = function remove(query) {
-  console.log('start delete');
-  var countDelete = 0;
-  var deleteElements = findInArray(phoneBook, query, true);
-  deleteElements.forEach(function(index){
-    phoneBook.splice(index, 1); 
-    countDelete++;
-  }) 
-  console.log("%s %d %s",'Удален(о)', countDelete, 'Контакт(а)');  
-  return countDelete;     
+    console.log('start delete');
+    //var countDelete = 0;
+    var deleteElements = findInArray(phoneBook, query);
+    var NewPhoneBook = phoneBook.filter(function (person) {
+
+        return (!(inArray(person, deleteElements)));
+    });
+    console.log("%s %d %s",'Удален(о)', deleteElements.length, 'Контакт(а)');
+    return deleteElements.length;    
 };

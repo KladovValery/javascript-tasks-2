@@ -3,16 +3,18 @@
 var phoneBook = [];
 
 function isEmailValid(email) {
-    return /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/.test(email);
+    return email && typeof email === 'string' &&
+    /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/.test(email);
+    
 }
 
 function isPhoneValid(phone) {
-
-    return /^\+\d{2}\(\d{3}\)\d{3}-\d{2}-\d{2}$/.test(phone);
+    return phone && typeof phone === 'string' &&
+    /^\+\d{1,2}\(\d{3}\)\d{3}-\d{2}-\d{2}$/.test(phone);
 }
 
 function isNameValid(name) {
-    return /^[А-ЯЁ][а-яё]+$/.test(name);
+    return (name && typeof name === 'string');
 }
 
 function getClearPhone(phone) {
@@ -44,6 +46,7 @@ function findInArray(array, query, onlyIndex){
    На вход может прийти что угодно, будьте осторожны.
 */
 module.exports.add = function add(name, phone, email) {
+    console.log('add');
     var clearedPhone = getClearPhone(phone);
     if (checkValidForms(name, clearedPhone, email)) {  
         var person = {
@@ -67,7 +70,7 @@ module.exports.find = function find(query) {
     console.log("start find");
     var foundRes = [];
 
-    query ? foundRes = findInArray(phoneBook, query) : foundRes = phoneBook;
+    var foundRes = query ? findInArray(phoneBook, query) : phoneBook;
 
     foundRes.forEach(function(person){
         console.log("%s, %s, %s", person.name, person.phone, person.email);
